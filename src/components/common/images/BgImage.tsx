@@ -4,6 +4,7 @@ import { WHITELABEL_ENV } from '../../../../config/features';
 const getClassName = () => {
   switch (WHITELABEL_ENV) {
     case 'ZK_SYNC':
+    case 'BASE':
       return 'opacity-10';
     default:
       return '';

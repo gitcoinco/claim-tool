@@ -1,5 +1,6 @@
 import colors from 'tailwindcss/colors';
 import {
+  base,
   mainnet,
   optimism,
   optimismSepolia,
@@ -8,7 +9,7 @@ import {
   zksyncSepoliaTestnet,
 } from 'wagmi/chains';
 
-type WHITELABEL_ENV = 'OPTIMISM' | 'ZK_SYNC';
+type WHITELABEL_ENV = 'OPTIMISM' | 'ZK_SYNC' | 'BASE';
 
 const _WHITELABEL_ENV = process.env.NEXT_PUBLIC_WHITELABEL_ENV;
 
@@ -16,7 +17,7 @@ if (!_WHITELABEL_ENV) {
   throw new Error('NEXT_PUBLIC_WHITELABEL_ENV is not set');
 }
 
-if (!(_WHITELABEL_ENV === 'OPTIMISM' || _WHITELABEL_ENV === 'ZK_SYNC')) {
+if (!['OPTIMISM', 'ZK_SYNC', 'BASE'].includes(_WHITELABEL_ENV)) {
   throw new Error('NEXT_PUBLIC_WHITELABEL_ENV is not set to a valid value');
 }
 
@@ -54,6 +55,15 @@ const featureMatrix: Record<WHITELABEL_ENV, Features> = {
     DELEGATES_URL: 'https://vote.zknation.io/dao/delegates',
     CONFIRMATION_CHECKMARK_BG_COLOR: 'black',
   },
+  BASE: {
+    APP_NAME: 'Base Claim Tool',
+    BG_IMAGE: {
+      src: '/base-bg-img.svg',
+    },
+    DELEGATION_REQUIRED: false,
+    DELEGATION_ENABLED: false,
+    CONFIRMATION_CHECKMARK_BG_COLOR: '#0052FF',
+  },
 };
 
 export const FEATURES = featureMatrix[_WHITELABEL_ENV];
@@ -75,6 +85,11 @@ export const getChainConfig = () => {
       return {
         appName: 'ZKsync Claim Tool',
         chains: [mainnet, zksync, zksyncSepoliaTestnet],
+      };
+    case 'BASE':
+      return {
+        appName: 'Base Claim Tool',
+        chains: [base],
       };
   }
 };
@@ -98,6 +113,12 @@ export const getWhitelabelThemeColors = (): WhitelabelThemeColors => {
         bgClaimcardHeader: colors.blue[200],
         primaryAction: colors.blue[500],
         primaryActionButtonBg: colors.blue[900],
+      };
+    case 'BASE':
+      return {
+        bgClaimcardHeader: colors.blue[100],
+        primaryAction: colors.blue[400],
+        primaryActionButtonBg: colors.blue[700],
       };
   }
 };

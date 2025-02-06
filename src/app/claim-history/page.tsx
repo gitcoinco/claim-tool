@@ -77,7 +77,8 @@ const ClaimHistory = () => {
                             <p>Remaining: </p>
                             <CurrencySymbol token={grant.campaign.token} />
                             <p className="font-semibold text-black">
-                              {Math.round(grant.grantAmount - grant.claimed)}{' '}
+                              {Math.round(grant.grantAmount - grant.claimed) ||
+                                0}{' '}
                               {grant.campaign.token?.ticker}
                             </p>
                           </div>

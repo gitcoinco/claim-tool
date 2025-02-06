@@ -188,7 +188,7 @@ export default function ClaimCard({ grant }: { grant: Grant }) {
                     />
                   </div>
                   {DELEGATES_URL && (
-                    <p className="text-sm">
+                    <p className="text-sm mb-8">
                       You can visit{' '}
                       <a
                         className="font-semibold text-black"
@@ -204,16 +204,15 @@ export default function ClaimCard({ grant }: { grant: Grant }) {
                   )}
                 </>
               ) : (
-                <div className="flex flex-col space-y-2">
-                  <p className="text-sm font-bold">Claim the token.</p>
-                  <p className="text-sm">Ready to claim your rewards?</p>
-                </div>
+                <p className="text-sm mb-8">
+                  Excellent. You are now ready to claim your rewards.
+                </p>
               )}
             </CardContent>
             <CardFooter className="py-0">
               <Button
                 type="submit"
-                className="bg-primaryActionButtonBg hover:bg-initial"
+                className="bg-primaryActionButtonBg hover:bg-initial rounded-full py-4 px-14"
                 disabled={
                   !form.formState.isValid || isPending || !isCorrectChain
                 }

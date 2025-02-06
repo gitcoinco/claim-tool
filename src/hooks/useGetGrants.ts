@@ -315,6 +315,9 @@ export const useGetGrants = () => {
       // Fetch hedgey campaigns from their graphql api
       const hedgeyCampaigns = await fetchCampaigns(campaignIds);
 
+      console.log('----> grants', grants);
+      console.log('----> hedgeyCampaigns', hedgeyCampaigns);
+
       const [proofs, claimHistory] = await Promise.all([
         // Fetch proofs from their rest api
         getProofs(
@@ -332,6 +335,7 @@ export const useGetGrants = () => {
             })
             .filter((x) => !!x),
         ),
+
         // Fetch claim history from their graphql api
         getClaimHistory(
           address,
@@ -341,6 +345,8 @@ export const useGetGrants = () => {
           })),
         ),
       ]);
+      console.log('----> proofs', proofs);
+      console.log('----> claimHistory', claimHistory);
 
       // Combine the data
       const mappedGrants = grants.data
@@ -380,6 +386,8 @@ export const useGetGrants = () => {
           const tokenReleasedInDays = getNextTokenReleaseTimestamp(
             campaign.claimLockup,
           )?.daysUntilNextRelease;
+
+          console.log('----> grant', grant);
 
           return {
             id: grant.uuid,

@@ -8,7 +8,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { RiArrowRightUpLine } from '@remixicon/react';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   ContractFunctionExecutionError,
@@ -28,6 +28,7 @@ import {
 import { Input } from '../ui/input';
 import SuccessCheckmark from './images/SuccessCheckmark';
 
+import { Synaps } from '@synaps-io/verify-sdk';
 import { Loader2 } from 'lucide-react';
 import { useChainId } from 'wagmi';
 import { FEATURES } from '../../../config/features';
@@ -158,93 +159,116 @@ export default function ClaimCard({ grant }: { grant: Grant }) {
     return 'Claim';
   }, [isPending, isCorrectChain, grant.chainId, isDelegationRequired]);
 
+  Synaps.init({
+    sessionId: process.env.SYNAPS_SESSION_ID || '', // TODO: Add session id to env
+    onFinish: () => {
+      alert('Verification finished');
+    },
+    mode: 'modal',
+  });
+
+  const handleOpen = () => {
+    console.log('open');
+    Synaps.show();
+  };
+
   return (
-    <Card className="bg-transparent border border-neutral-300 shadow-none py-10 px-4">
-      {step === 'form' && (
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardContent className="space-y-6">
-              {DELEGATION_REQUIRED ? (
-                <>
-                  <div className="grid w-full max-w-sm items-center gap-3">
-                    <FormField
-                      control={form.control}
-                      name="delegateAddress"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-lg font-normal">
-                            Enter the delegate's address
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              className="bg-transparent border-neutral-300"
-                              placeholder="0x..."
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  {DELEGATES_URL && (
-                    <p className="text-sm mb-8">
-                      You can visit{' '}
-                      <a
-                        className="font-semibold text-black"
-                        href={DELEGATES_URL}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        this page
-                      </a>{' '}
-                      to find the delegate who should represent for you, or
-                      delegate the token to yourself.
-                    </p>
-                  )}
-                </>
-              ) : (
-                <p className="text-sm mb-8">
-                  Excellent. You are now ready to claim your rewards.
-                </p>
-              )}
-            </CardContent>
-            <CardFooter className="py-0">
-              <Button
-                type="submit"
-                className="bg-primaryActionButtonBg hover:bg-initial rounded-full py-4 px-14"
-                disabled={
-                  !form.formState.isValid || isPending || !isCorrectChain
-                }
-              >
-                {buttonContent}
-              </Button>
-            </CardFooter>
-          </form>
-        </Form>
-      )}
-      {step === 'confirmation' && (
-        <CardContent className="p-0 space-y-6 flex flex-col items-center">
-          <p className="text-lg">All done!</p>
-          <SuccessCheckmark color={CONFIRMATION_CHECKMARK_BG_COLOR} />
-          <div className="flex space-x-2">
-            {txHash && (
-              <Link
-                target="_blank"
-                href={generateBlockExplorerUrl(grant.chainId, txHash)}
-              >
-                <Button className="w-full group">
-                  View on block explorer{' '}
-                  <RiArrowRightUpLine
-                    className="ml-1 text-white w-4 h-4 transition-transform duration-300 ease-in-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
-                    aria-hidden="true"
-                  />
+    <>
+      <div className="flex justify-center mb-8">
+        <Button
+          className="bg-primaryActionButtonBg hover:bg-initial rounded-full py-4 px-14"
+          onClick={handleOpen}
+        >
+          Start verification
+        </Button>
+      </div>
+      <Card className="bg-transparent border border-neutral-300 shadow-none py-10 px-4">
+        {step === 'form' && (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <CardContent className="space-y-6">
+                {DELEGATION_REQUIRED ? (
+                  <>
+                    <div className="grid w-full max-w-sm items-center gap-3">
+                      <FormField
+                        control={form.control}
+                        name="delegateAddress"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-lg font-normal">
+                              Enter the delegate's address
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                className="bg-transparent border-neutral-300"
+                                placeholder="0x..."
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    {DELEGATES_URL && (
+                      <p className="text-sm mb-8">
+                        You can visit{' '}
+                        <a
+                          className="font-semibold text-black"
+                          href={DELEGATES_URL}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          this page
+                        </a>{' '}
+                        to find the delegate who should represent for you, or
+                        delegate the token to yourself.
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm mb-8">
+                    Excellent. You are now ready to claim your rewards.
+                  </p>
+                )}
+              </CardContent>
+              <CardFooter className="py-0">
+                <Button
+                  type="submit"
+                  className="bg-primaryActionButtonBg hover:bg-initial rounded-full py-4 px-14"
+                  disabled={
+                    !form.formState.isValid || isPending || !isCorrectChain
+                  }
+                >
+                  {buttonContent}
                 </Button>
-              </Link>
-            )}
-          </div>
-        </CardContent>
-      )}
-    </Card>
+              </CardFooter>
+            </form>
+          </Form>
+        )}
+        {step === 'confirmation' && (
+          <CardContent className="p-0 space-y-6 flex flex-col items-center">
+            <p className="text-lg">All done!</p>
+            <SuccessCheckmark color={CONFIRMATION_CHECKMARK_BG_COLOR} />
+            <div className="flex space-x-2">
+              {txHash && (
+                <Link
+                  target="_blank"
+                  href={generateBlockExplorerUrl(grant.chainId, txHash)}
+                >
+                  <Button className="w-full group">
+                    View on block explorer{' '}
+                    <RiArrowRightUpLine
+                      className="ml-1 text-white w-4 h-4 transition-transform duration-300 ease-in-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
+                      aria-hidden="true"
+                    />
+                  </Button>
+                </Link>
+              )}
+            </div>
+          </CardContent>
+        )}
+      </Card>
+    </>
   );
 }

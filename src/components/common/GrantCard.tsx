@@ -61,7 +61,7 @@ const GrantCard = ({ grant }: { grant: Grant }) => {
         <CardContent className="py-8 px-10 relative">
           <div className="flex items-center gap-2 absolute top-0 right-0 -translate-x-[8px] -translate-y-1/2 cursor-default">
             {grant.campaign.ended && (
-              <Badge className="bg-orange-500">Cancelled</Badge>
+              <Badge className="bg-red-100">Cancelled</Badge>
             )}
             {grant.proof?.claimed && (
               <Badge className="bg-primaryActionButtonBg">Claimed</Badge>

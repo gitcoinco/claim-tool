@@ -23,9 +23,12 @@ if (!['OPTIMISM', 'ZK_SYNC', 'BASE'].includes(_WHITELABEL_ENV)) {
 
 export const WHITELABEL_ENV = _WHITELABEL_ENV;
 
+export const ROUND_NAME =
+  process.env.NEXT_PUBLIC_ROUND_NAME || `${WHITELABEL_ENV} Round`;
+
 interface Features {
   APP_NAME: string;
-  BG_IMAGE: {
+  BG_IMAGE?: {
     src: string;
   };
   DELEGATION_REQUIRED: boolean;
@@ -57,9 +60,6 @@ const featureMatrix: Record<WHITELABEL_ENV, Features> = {
   },
   BASE: {
     APP_NAME: 'Base Claim Tool',
-    BG_IMAGE: {
-      src: '/base-bg-img.svg',
-    },
     DELEGATION_REQUIRED: false,
     DELEGATION_ENABLED: false,
     CONFIRMATION_CHECKMARK_BG_COLOR: '#0052FF',
@@ -89,7 +89,7 @@ export const getChainConfig = () => {
     case 'BASE':
       return {
         appName: 'Base Claim Tool',
-        chains: [base],
+        chains: [base, sepolia],
       };
   }
 };

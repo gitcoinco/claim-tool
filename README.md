@@ -60,3 +60,8 @@ The OP Claim Tool is a web application for Optimism grant recipients to claim an
 - `pnpm format`: Run Biome formatter
 
 For more details, refer to the project documentation.
+
+## Testing
+- For testing use sepolia
+- [Mint PLBR token](https://eth-sepolia.blockscout.com/token/0xdF0A43D15B036c065f6895734B878fD31269Bfa3?tab=read_write_contract)
+- Create a hedgey token grant

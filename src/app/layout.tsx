@@ -30,13 +30,15 @@ export default function RootLayout({
 }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${sora.variable}`}>
-      <body className="bg-secondary">
+      <body>
         <ContextProvider>
           <ClientLayout>{children}</ClientLayout>
         </ContextProvider>
-        <div className="fixed inset-0 w-full h-full -z-10 flex items-center justify-center">
-          <BackgroundImage src={FEATURES.BG_IMAGE.src} />
-        </div>
+        {FEATURES.BG_IMAGE && (
+          <div className="fixed inset-0 w-full h-full -z-10 flex items-center justify-center">
+            <BackgroundImage src={FEATURES.BG_IMAGE.src} />
+          </div>
+        )}
         <Toaster />
       </body>
     </html>

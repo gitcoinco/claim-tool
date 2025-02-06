@@ -33,11 +33,13 @@ const GrantPage = () => {
           <ChevronLeft className="" />
           <span>Back to all grants</span>
         </Link>
-        <h2 className="text-lg font-semibold mb-4">You're claiming</h2>
+        <h2 className="text-4xl font-bold mb-6">You're claiming for</h2>
         <h1 className="text-4xl font-bold flex items-center gap-2">
-          <span className="bg-neutral-200 rounded-md p-3">{grant?.title}</span>
+          <span className="bg-neutral-200 rounded-full py-3 px-5">
+            {grant?.title}
+          </span>
           with
-          <span className="bg-neutral-200 rounded-md p-3 flex items-center gap-2 w-fit">
+          <span className="bg-neutral-200 rounded-full py-3 px-5 flex items-center gap-2 w-fit">
             <CurrencySymbol token={grant?.campaign.token} />
             {grant?.grantAmount} {grant?.campaign.token?.ticker}
           </span>

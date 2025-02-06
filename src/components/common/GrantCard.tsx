@@ -24,7 +24,7 @@ const GrantCard = ({ grant }: { grant: Grant }) => {
 
   return (
     <>
-      <Card className="shadow-none">
+      <Card className="shadow-none bg-[#f7f7f7] border-none">
         {grant.currentUserCanClaim && isConnected && (
           <div className="flex items-center justify-between bg-bgClaimcardHeader px-10 py-2 rounded-t-lg">
             <p className="text-sm">
@@ -58,99 +58,107 @@ const GrantCard = ({ grant }: { grant: Grant }) => {
             )}
           </div>
         )}
-        <CardContent className="flex flex-col md:flex-row items-start md:items-center space-between py-8 px-10 relative">
+        <CardContent className="py-8 px-10 relative">
           <div className="flex items-center gap-2 absolute top-0 right-0 -translate-x-[8px] -translate-y-1/2 cursor-default">
             {grant.campaign.ended && (
-              <Badge className="bg-red-500">Cancelled</Badge>
+              <Badge className="bg-orange-500">Cancelled</Badge>
             )}
-            {grant.proof?.claimed && <Badge className="">Claimed</Badge>}
+            {grant.proof?.claimed && (
+              <Badge className="bg-primaryActionButtonBg">Claimed</Badge>
+            )}
           </div>
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-8 flex-grow">
-            <ProjectImage src={grant.projectImage} />
-            <div className="flex flex-col gap-2 max-w-2xl">
-              <p className="font-semibold text-xl">{grant.title}</p>
-              <p className="text-sm text-gray-500 line-clamp-3">
-                {grant.description}
-              </p>
-              <div className="flex h-5 items-center space-x-4 text-xs text-gray-500 mt-8">
-                <p>
-                  Date of award:{' '}
-                  <span className="font-semibold text-black">
-                    {grant.date.toLocaleDateString()}
-                  </span>
+          <div className="flex flex-row">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-8 flex-grow">
+              <ProjectImage src={grant.projectImage} />
+              <div className="flex flex-col gap-2 max-w-2xl">
+                <p className="font-semibold text-xl">{grant.title}</p>
+                <p className="text-sm text-gray-500 line-clamp-3 h-[61px]">
+                  {grant.description}
                 </p>
-                {grant.tokenReleasedInDays && (
-                  <>
-                    <Separator orientation="vertical" />
-                    <p>
-                      Released in:{' '}
-                      <span className="font-semibold text-black">
-                        {grant.tokenReleasedInDays}{' '}
-                        {grant.tokenReleasedInDays > 1 ? 'days' : 'day'}
-                      </span>
-                    </p>
-                  </>
-                )}
-                {grant.delegateTo && (
-                  <>
-                    <Separator orientation="vertical" />
-                    <div className="flex items-center gap-2">
-                      <p>Delegate to: </p>
-                      <Link
-                        className="group flex items-center font-semibold text-black"
-                        href={generateBlockExplorerUrl(
-                          grant.chainId,
-                          grant.delegateTo,
-                        )}
-                        target="_blank"
-                      >
-                        {truncate(grant.delegateTo, 11)}{' '}
-                        <RiArrowRightUpLine
-                          className="ml-1 text-neutral-500 w-4 h-4 opacity-70 transition-transform duration-300 ease-in-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
-                          aria-hidden="true"
-                        />
-                      </Link>
-                    </div>
-                  </>
-                )}
-                {grant.latestClaimHash && (
-                  <>
-                    <Separator orientation="vertical" />
-                    <div className="flex items-center gap-2">
-                      <p>Latest claim: </p>
-                      <a
-                        target="_blank"
-                        className="group flex items-center font-semibold text-black"
-                        href={generateBlockExplorerUrl(
-                          grant.chainId,
-                          grant.latestClaimHash,
-                        )}
-                        rel="noreferrer"
-                      >
-                        {truncate(grant.latestClaimHash, 11)}{' '}
-                        <RiArrowRightUpLine
-                          className="ml-1 text-neutral-500 w-4 h-4 opacity-70 transition-transform duration-300 ease-in-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
-                          aria-hidden="true"
-                        />
-                      </a>
-                    </div>
-                  </>
-                )}
               </div>
             </div>
+
+            {grant.campaign.token && (
+              <div className="flex items-center gap-2 font-semibold">
+                <CurrencySymbol token={grant.campaign.token} />
+                <span
+                  className={
+                    grant.currentUserCanClaim ? 'text-black' : 'text-gray-500'
+                  }
+                >
+                  {grant.grantAmount} {grant.campaign.token.ticker}
+                </span>
+              </div>
+            )}
           </div>
-          {grant.campaign.token && (
-            <div className="flex items-center gap-2 font-semibold">
-              <CurrencySymbol token={grant.campaign.token} />
-              <span
-                className={
-                  grant.currentUserCanClaim ? 'text-black' : 'text-gray-500'
-                }
-              >
-                {grant.grantAmount} {grant.campaign.token.ticker}
-              </span>
+          <div className="flex gap-8 mt-8">
+            <div className="w-20" />
+            <div className="flex h-5 items-center space-x-4 text-xs text-gray-500">
+              <p>
+                Date of award:{' '}
+                <span className="font-medium text-black">
+                  {grant.date.toLocaleDateString()}
+                </span>
+              </p>
+              {grant.tokenReleasedInDays && (
+                <>
+                  <Separator orientation="vertical" />
+                  <p>
+                    Released in:{' '}
+                    <span className="font-medium text-black">
+                      {grant.tokenReleasedInDays}{' '}
+                      {grant.tokenReleasedInDays > 1 ? 'days' : 'day'}
+                    </span>
+                  </p>
+                </>
+              )}
+              {grant.delegateTo && (
+                <>
+                  <Separator orientation="vertical" />
+                  <div className="flex items-center gap-2">
+                    <p>Delegate to: </p>
+                    <Link
+                      className="group flex items-center font-medium text-black"
+                      href={generateBlockExplorerUrl(
+                        grant.chainId,
+                        grant.delegateTo,
+                      )}
+                      target="_blank"
+                    >
+                      {truncate(grant.delegateTo, 11)}{' '}
+                      <RiArrowRightUpLine
+                        className="ml-1 text-neutral-500 w-4 h-4 opacity-70 transition-transform duration-300 ease-in-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
+                        aria-hidden="true"
+                      />
+                    </Link>
+                  </div>
+                </>
+              )}
+              {grant.latestClaimHash && (
+                <>
+                  <Separator orientation="vertical" />
+                  <div className="flex items-center gap-2">
+                    <p>Latest claim: </p>
+                    <a
+                      target="_blank"
+                      className="group flex items-center font-medium text-black"
+                      href={generateBlockExplorerUrl(
+                        grant.chainId,
+                        grant.latestClaimHash,
+                      )}
+                      rel="noreferrer"
+                    >
+                      {truncate(grant.latestClaimHash, 11)}{' '}
+                      <RiArrowRightUpLine
+                        className="ml-1 text-neutral-500 w-4 h-4 opacity-70 transition-transform duration-300 ease-in-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
+                        aria-hidden="true"
+                      />
+                    </a>
+                  </div>
+                </>
+              )}
             </div>
-          )}
+          </div>
         </CardContent>
       </Card>
     </>

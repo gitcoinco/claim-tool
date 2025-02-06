@@ -40,7 +40,7 @@ const getRpcUrlForChain = (chainId: number) => {
     case zksync.id:
       return 'https://mainnet.era.zksync.io';
     case base.id:
-      return 'https://mainnet.base.org';
+      return 'https://base-rpc.publicnode.com';
     default:
       throw new Error(`Unsupported chain: ${chainId}`);
   }

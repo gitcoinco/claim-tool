@@ -1,6 +1,7 @@
 'use client';
 
 import { useDisconnect } from '@/hooks/useAuth';
+import { cn } from '@/lib/utils';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { RiFileHistoryLine, RiLogoutBoxRLine } from '@remixicon/react';
 import { useRouter } from 'next/navigation';
@@ -11,8 +12,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-
-const WalletConnectButton = () => {
+const WalletConnectButton = ({
+  text,
+  classNames,
+}: {
+  text?: string;
+  classNames?: string;
+}) => {
   const { disconnect } = useDisconnect();
   return (
     <ConnectButton.Custom>
@@ -49,11 +55,14 @@ const WalletConnectButton = () => {
                 return (
                   <Button
                     variant="outline"
-                    className="border-secondary-foreground"
+                    className={cn(
+                      'bg-primaryActionButtonBg text-white rounded-full',
+                      classNames,
+                    )}
                     onClick={openConnectModal}
                     type="button"
                   >
-                    Connect Wallet
+                    {text || 'Connect Wallet'}
                   </Button>
                 );
               }

@@ -68,7 +68,6 @@ export async function GET(req: NextRequest) {
   );
   const sheetNames = await sheetNamesResponse.json();
   const title: string = sheetNames?.sheets[0]?.properties?.title;
-
   if (!title) {
     return Response.json({
       success: false,

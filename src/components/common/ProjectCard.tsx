@@ -3,12 +3,12 @@ import type { Grant } from '@/context/GrantsContext';
 
 const ProjectCard = ({ grant }: { grant: Grant }) => {
   return (
-    <Card className="w-full border-black shadow-none bg-transparent">
+    <Card className="w-full shadow-none bg-[#f7f7f7] border-none">
       <CardContent className="py-8 px-10 space-y-6">
-        <p>Your project</p>
+        <p className="text-xl font-medium">Your project</p>
         <div className="flex items-center">
           <img
-            className="h-[80px] mr-4"
+            className="h-20 mr-4 rounded-md"
             alt="Project logo"
             src={grant.projectImage}
           />

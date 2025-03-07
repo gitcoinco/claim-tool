@@ -93,7 +93,6 @@ export async function GET(req: NextRequest) {
     );
   }
   const title: string = sheetNames?.sheets[0]?.properties?.title;
-
   if (!title) {
     return Response.json(
       {

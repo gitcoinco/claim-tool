@@ -31,10 +31,6 @@ const Grants = () => {
   const filteredAndSortedGrants = useMemo(() => {
     let filtered = displayedGrants;
 
-    if (FEATURES.ONLY_SHOW_CLAIMABLE) {
-      filtered = filtered.filter((grant) => grant.currentUserCanClaim);
-    }
-
     if (searchTerm) {
       filtered = filtered.filter((grant) =>
         grant.title.toLowerCase().includes(searchTerm.toLowerCase()),

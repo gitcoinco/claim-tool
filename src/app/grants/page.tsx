@@ -17,6 +17,7 @@ import { FilterOption, useGrants } from '@/context/GrantsContext';
 import { Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useAccount, useConnectorClient } from 'wagmi';
+import { FEATURES } from '../../../config/features';
 
 const Grants = () => {
   const { displayedGrants, loadMore, grants, isLoading, isFetched } =
@@ -80,11 +81,7 @@ const Grants = () => {
     <>
       <div className="flex flex-col gap-6 items-start">
         <h1 className="text-4xl font-bold">Grants</h1>
-        <p>
-          Explore all grants from the OP Citizen Grants Council and who they've
-          delegated to. For grantees, this claiming tool offers a self-serve
-          interface to claim and delegate your grant.
-        </p>
+        <p>{FEATURES.INTRO_TEXT}</p>
       </div>
       <div className="flex items-center gap-2 my-6">
         <div className="relative w-full">

@@ -406,6 +406,9 @@ export const useGetGrants = () => {
           const chainId = getChainIdByNetworkName(grant.campaign.network);
           return supportedChainIds.includes(chainId);
         })
+        .filter((grant) =>
+          FEATURES.ONLY_SHOW_CLAIMABLE ? grant.currentUserCanClaim : grant,
+        )
         .toSorted((a, b) => (a.address === address ? -1 : 1))
         .toSorted(
           (a, b) =>

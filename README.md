@@ -1,14 +1,14 @@
 # Claim Tool
 
 ## Description
-The Claim Tool is a web application for Optimism grant recipients to claim and delegate awarded tokens. It integrates with Hedgey API for token claims and Agora API for delegate information, providing a dashboard for grant metrics and delegation statuses.
+The Claim Tool is a web application for grant recipients to claim and delegate awarded tokens. It integrates with Hedgey API for token claims and Agora API for delegate information, providing a dashboard for grant metrics and delegation statuses.
 
 ## Quick Start
 
 1. Clone and install:
    ```
-   git clone https://github.com/grants-stack-frontier/op-claim-tool.git
-   cd op-claim-tool
+   git clone https://github.com/gitcoinco/claim-tool.git
+   cd claim-tool
    pnpm install
    ```
 

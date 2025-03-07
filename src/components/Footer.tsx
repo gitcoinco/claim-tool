@@ -17,10 +17,7 @@ const Footer = () => {
             <RaidGuild />
           </Link>
         </div>
-        <Link
-          href="https://github.com/grants-stack-frontier/op-claim-tool"
-          target="_blank"
-        >
+        <Link href="https://github.com/gitcoinco/claim-tool" target="_blank">
           <RiGithubFill className="w-8 h-8" />
         </Link>
       </div>

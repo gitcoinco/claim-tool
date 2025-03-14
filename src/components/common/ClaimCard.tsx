@@ -243,6 +243,21 @@ export default function ClaimCard({ grant }: { grant: Grant }) {
                 </Button>
               </Link>
             )}
+
+            {FEATURES.CONFIRMATION_SECOND_BUTTON_TEXT.length > 0 && (
+              <Link
+                target="_blank"
+                href={FEATURES.CONFIRMATION_SECOND_BUTTON_LINK}
+              >
+                <Button className="w-full group">
+                  {FEATURES.CONFIRMATION_SECOND_BUTTON_TEXT}
+                  <RiArrowRightUpLine
+                    className="ml-1 text-white w-4 h-4 transition-transform duration-300 ease-in-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
+                    aria-hidden="true"
+                  />
+                </Button>
+              </Link>
+            )}
           </div>
         </CardContent>
       )}

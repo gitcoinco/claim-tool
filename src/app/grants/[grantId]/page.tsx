@@ -42,6 +42,11 @@ const GrantPage = () => {
             {grant?.grantAmount} {grant?.campaign.token?.ticker}
           </span>
         </h1>
+        {FEATURES.CONFIRMATION_SUBHEADER.length > 0 && (
+          <div className="text-lg font-semibold pt-3">
+            {FEATURES.CONFIRMATION_SUBHEADER}
+          </div>
+        )}
         <div className="pt-14 flex items-start gap-8">
           <div className="w-3/5">
             <ClaimCard grant={grant} />

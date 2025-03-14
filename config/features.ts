@@ -33,6 +33,9 @@ interface Features {
   CONFIRMATION_CHECKMARK_BG_COLOR: string;
   INTRO_TEXT: string;
   ONLY_SHOW_CLAIMABLE: boolean;
+  CONFIRMATION_SUBHEADER: string;
+  CONFIRMATION_SECOND_BUTTON_TEXT: string;
+  CONFIRMATION_SECOND_BUTTON_LINK: string;
 }
 
 const featureMatrix: Record<WHITELABEL_ENV, Features> = {
@@ -48,6 +51,10 @@ const featureMatrix: Record<WHITELABEL_ENV, Features> = {
     INTRO_TEXT:
       "Explore all grants from the OP Citizen Grants Council and who they've delegated to. For grantees, this claiming tool offers a self-serve interface to claim and delegate your grant.",
     ONLY_SHOW_CLAIMABLE: false,
+    CONFIRMATION_SUBHEADER:
+      'We strongly encourage you to set a delegate to represent you in Optimism governance.',
+    CONFIRMATION_SECOND_BUTTON_TEXT: 'Choose your representative',
+    CONFIRMATION_SECOND_BUTTON_LINK: 'https://vote.optimism.io/delegates',
   },
   ZK_SYNC: {
     APP_NAME: 'ZKsync Claim Tool',
@@ -61,6 +68,9 @@ const featureMatrix: Record<WHITELABEL_ENV, Features> = {
     INTRO_TEXT:
       "Explore the grants you are eligible from the ZKsync foundation and who they've delegated to. For grantees, this claiming tool offers a self-serve interface to claim and delegate your grant.",
     ONLY_SHOW_CLAIMABLE: true,
+    CONFIRMATION_SUBHEADER: '',
+    CONFIRMATION_SECOND_BUTTON_TEXT: '',
+    CONFIRMATION_SECOND_BUTTON_LINK: '',
   },
 };
 

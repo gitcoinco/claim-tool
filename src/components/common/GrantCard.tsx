@@ -25,7 +25,7 @@ const GrantCard = ({ grant }: { grant: Grant }) => {
   return (
     <>
       <Card className="shadow-none">
-        {isConnected && (
+        {grant.currentUserCanClaim && isConnected && (
           <div className="flex items-center justify-between bg-bgClaimcardHeader px-10 py-2 rounded-t-lg">
             <p className="text-sm">
               You are eligible to claim this grant

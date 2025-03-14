@@ -61,7 +61,7 @@ export default function ClaimCard({ grant }: { grant: Grant }) {
   const { mutateAsync: claimAndDelegate, isPending } =
     useContractClaimAndDelegate();
 
-  const [step, setStep] = useState<'form' | 'confirmation'>('confirmation');
+  const [step, setStep] = useState<'form' | 'confirmation'>('form');
   const [txHash, setTxHash] = useState<string>();
 
   // TODO: Enable ENS
@@ -229,19 +229,19 @@ export default function ClaimCard({ grant }: { grant: Grant }) {
           <p className="text-lg">All done!</p>
           <SuccessCheckmark color={CONFIRMATION_CHECKMARK_BG_COLOR} />
           <div className="flex space-x-2">
-            {true && (
-              // <Link
-              //   target="_blank"
-              //   // href={generateBlockExplorerUrl(grant.chainId, txHash)}
-              // >
-              <Button className="w-full group">
-                View on block explorer{' '}
-                <RiArrowRightUpLine
-                  className="ml-1 text-white w-4 h-4 transition-transform duration-300 ease-in-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
-                  aria-hidden="true"
-                />
-              </Button>
-              // </Link>
+            {txHash && (
+              <Link
+                target="_blank"
+                href={generateBlockExplorerUrl(grant.chainId, txHash)}
+              >
+                <Button className="w-full group">
+                  View on block explorer{' '}
+                  <RiArrowRightUpLine
+                    className="ml-1 text-white w-4 h-4 transition-transform duration-300 ease-in-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
+                    aria-hidden="true"
+                  />
+                </Button>
+              </Link>
             )}
 
             {FEATURES.CONFIRMATION_SECOND_BUTTON_TEXT.length > 0 && (

@@ -88,7 +88,11 @@ export const useContractClaimAndDelegate = () => {
       const publicClient = getPublicClientForChain(chainId);
       // Prepare contract call variables
       const parsedClaimId = toHex(uuidParse(claim.uuid));
-      const value = BigInt(claim.claimFee);
+
+      let value = BigInt(0);
+      if (FEATURES.CLAIM_FEE) {
+        value = BigInt(claim.claimFee);
+      }
 
       let txHash: `0x${string}` | undefined;
       if (delegatee) {

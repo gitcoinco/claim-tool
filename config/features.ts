@@ -36,6 +36,7 @@ interface Features {
   CONFIRMATION_SUBHEADER: string;
   CONFIRMATION_SECOND_BUTTON_TEXT: string;
   CONFIRMATION_SECOND_BUTTON_LINK: string;
+  CLAIM_FEE: boolean;
 }
 
 const featureMatrix: Record<WHITELABEL_ENV, Features> = {
@@ -55,6 +56,7 @@ const featureMatrix: Record<WHITELABEL_ENV, Features> = {
       'We strongly encourage you to set a delegate to represent you in Optimism governance.',
     CONFIRMATION_SECOND_BUTTON_TEXT: 'Choose your representative',
     CONFIRMATION_SECOND_BUTTON_LINK: 'https://vote.optimism.io/delegates',
+    CLAIM_FEE: false,
   },
   ZK_SYNC: {
     APP_NAME: 'ZKsync Claim Tool',
@@ -71,6 +73,7 @@ const featureMatrix: Record<WHITELABEL_ENV, Features> = {
     CONFIRMATION_SUBHEADER: '',
     CONFIRMATION_SECOND_BUTTON_TEXT: '',
     CONFIRMATION_SECOND_BUTTON_LINK: '',
+    CLAIM_FEE: true,
   },
 };
 

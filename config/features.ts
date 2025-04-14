@@ -1,5 +1,7 @@
 import colors from 'tailwindcss/colors';
 import {
+  base,
+  baseSepolia,
   mainnet,
   optimism,
   optimismSepolia,
@@ -8,15 +10,21 @@ import {
   zksyncSepoliaTestnet,
 } from 'wagmi/chains';
 
-type WHITELABEL_ENV = 'OPTIMISM' | 'ZK_SYNC';
+type WHITELABEL_ENV = 'OPTIMISM' | 'ZK_SYNC' | 'BASE';
 
-const _WHITELABEL_ENV = process.env.NEXT_PUBLIC_WHITELABEL_ENV;
+const _WHITELABEL_ENV = process.env.NEXT_PUBLIC_WHITELABEL_ENV ?? 'OPTIMISM';
 
 if (!_WHITELABEL_ENV) {
   throw new Error('NEXT_PUBLIC_WHITELABEL_ENV is not set');
 }
 
-if (!(_WHITELABEL_ENV === 'OPTIMISM' || _WHITELABEL_ENV === 'ZK_SYNC')) {
+if (
+  !(
+    _WHITELABEL_ENV === 'OPTIMISM' ||
+    _WHITELABEL_ENV === 'ZK_SYNC' ||
+    _WHITELABEL_ENV === 'BASE'
+  )
+) {
   throw new Error('NEXT_PUBLIC_WHITELABEL_ENV is not set to a valid value');
 }
 
@@ -75,6 +83,23 @@ const featureMatrix: Record<WHITELABEL_ENV, Features> = {
     CONFIRMATION_SECOND_BUTTON_LINK: '',
     CLAIM_FEE: true,
   },
+  BASE: {
+    APP_NAME: 'Base Claim Tool',
+    BG_IMAGE: {
+      src: '',
+    },
+    DELEGATION_REQUIRED: false,
+    DELEGATION_ENABLED: true,
+    DELEGATES_URL: 'https://vote.base.org/delegates',
+    CONFIRMATION_CHECKMARK_BG_COLOR: '#0070F3',
+    INTRO_TEXT:
+      "Explore all grants from the Base Citizen Grants Council and who they've delegated to. For grantees, this claiming tool offers a self-serve interface to claim and delegate your grant.",
+    ONLY_SHOW_CLAIMABLE: false,
+    CONFIRMATION_SUBHEADER: '',
+    CONFIRMATION_SECOND_BUTTON_TEXT: '',
+    CONFIRMATION_SECOND_BUTTON_LINK: '',
+    CLAIM_FEE: false,
+  },
 };
 
 export const FEATURES = featureMatrix[_WHITELABEL_ENV];
@@ -97,6 +122,11 @@ export const getChainConfig = () => {
         appName: 'ZKsync Claim Tool',
         chains: [mainnet, zksync, zksyncSepoliaTestnet],
       };
+    case 'BASE':
+      return {
+        appName: 'Base Claim Tool',
+        chains: [mainnet, base, baseSepolia, sepolia],
+      };
   }
 };
 
@@ -115,6 +145,12 @@ export const getWhitelabelThemeColors = (): WhitelabelThemeColors => {
         primaryActionButtonBg: colors.red[600],
       };
     case 'ZK_SYNC':
+      return {
+        bgClaimcardHeader: colors.blue[200],
+        primaryAction: colors.blue[500],
+        primaryActionButtonBg: colors.blue[900],
+      };
+    case 'BASE':
       return {
         bgClaimcardHeader: colors.blue[200],
         primaryAction: colors.blue[500],

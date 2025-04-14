@@ -40,6 +40,9 @@ const config: Config = {
       },
       colors: {
         ...getWhitelabelThemeColors(),
+        neutral: {
+          100: '#F2F3F8',
+        },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

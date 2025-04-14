@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60; // Set max duration to 60 seconds for Vercel Edge Functions
 
 export type GrantRow = {
   uuid: string;
@@ -39,6 +40,40 @@ const getUuidFromUrlOrUuid = (urlOrUuid: string) => {
   return null;
 };
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const fetchWithRetry = async (
+  url: string,
+  options: RequestInit,
+  maxRetries = 3,
+) => {
+  let lastError: Error | null = null;
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const response = await fetch(url, options);
+
+      if (response.status === 503) {
+        // Calculate exponential backoff delay (1s, 2s, 4s, etc.)
+        const delay = 2 ** i * 1000;
+        await sleep(delay);
+        continue;
+      }
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response;
+    } catch (error) {
+      lastError = error;
+      if (i === maxRetries - 1) throw error;
+    }
+  }
+
+  throw lastError;
+};
+
 export async function GET(req: NextRequest) {
   const __ = cookies();
   const apiKey = process.env.GOOGLE_SHEETS_API_KEY;
@@ -71,97 +106,82 @@ export async function GET(req: NextRequest) {
     'X-goog-api-key': apiKey,
   };
 
-  // Fetch sheet names
-  const sheetNamesResponse = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?&fields=sheets.properties`,
-    {
-      headers,
-    },
-  );
-  const sheetNames = await sheetNamesResponse.json();
-  if (!sheetNamesResponse.ok) {
-    console.error('Error fetching sheet name');
-    console.error(sheetNames);
-    return Response.json(
-      {
-        success: false,
-        message: sheetNames.error.message || 'Failed to fetch sheet names',
-      },
-      {
-        status: sheetNamesResponse.status || 500,
-      },
+  try {
+    // Fetch sheet names with retry logic
+    const sheetNamesResponse = await fetchWithRetry(
+      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties.title`,
+      { headers },
     );
-  }
-  const title: string = sheetNames?.sheets[0]?.properties?.title;
+    const sheetNames = await sheetNamesResponse.json();
+    const title: string = sheetNames?.sheets[0]?.properties?.title;
 
-  if (!title) {
-    return Response.json(
-      {
-        success: false,
-        message: 'Sheet title is not set',
-      },
-      {
-        status: 500,
-      },
-    );
-  }
-
-  const response = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${title}`,
-    {
-      headers,
-    },
-  );
-  const result = await response.json();
-  if (!response.ok) {
-    console.error('Error fetching sheet values');
-    console.error(result);
-    return Response.json(
-      {
-        success: false,
-        message: result.error.message || 'Failed to fetch sheet values',
-      },
-      {
-        status: response.status || 500,
-      },
-    );
-  }
-
-  const [header, ...rows] = result.values as string[][];
-  const grants = _.chain(rows)
-    .map((row) =>
-      row.reduce(
-        (acc, curr, index) => {
-          acc[header[index].toLowerCase()] = curr;
-          return acc;
+    if (!title) {
+      return Response.json(
+        {
+          success: false,
+          message: 'Sheet title is not set',
         },
-        {} as Record<string, string>,
-      ),
-    )
-    .map(
-      (grant) =>
-        ({
-          uuid: getUuidFromUrlOrUuid(grant.uuid),
-          title: grant.title,
-          description: grant.description,
-          projectImage: grant.image,
-          address: grant.address,
-        }) as GrantRow,
-    )
-    .filter((grant) => !!grant.uuid)
-    // If there are duplicates by (uuid, address), keep the bottom row
-    .reverse()
-    .uniqBy((grant) => `${grant.uuid}-${grant.address}`)
-    .value();
+        {
+          status: 500,
+        },
+      );
+    }
 
-  return Response.json(
-    {
-      data: grants,
-      success: true,
-      message: 'Grants fetched successfully',
-    },
-    {
-      status: 200,
-    },
-  );
+    // Fetch sheet values with retry logic and optimized range
+    const response = await fetchWithRetry(
+      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${title}!A:E`,
+      { headers },
+    );
+    const result = await response.json();
+
+    const [header, ...rows] = result.values as string[][];
+    const grants = _.chain(rows)
+      .map((row) =>
+        row.reduce(
+          (acc, curr, index) => {
+            acc[header[index].toLowerCase()] = curr;
+            return acc;
+          },
+          {} as Record<string, string>,
+        ),
+      )
+      .map(
+        (grant) =>
+          ({
+            uuid: getUuidFromUrlOrUuid(grant.uuid),
+            title: grant.title,
+            description: grant.description,
+            projectImage: grant.image,
+            address: grant.address,
+          }) as GrantRow,
+      )
+      .filter((grant) => !!grant.uuid)
+      // If there are duplicates by (uuid, address), keep the bottom row
+      .reverse()
+      .uniqBy((grant) => `${grant.uuid}-${grant.address}`)
+      .value();
+
+    return Response.json(
+      {
+        data: grants,
+        success: true,
+        message: 'Grants fetched successfully',
+      },
+      {
+        status: 200,
+      },
+    );
+  } catch (error) {
+    console.error('Error fetching grants:', error);
+    return Response.json(
+      {
+        success: false,
+        message:
+          error instanceof Error ? error.message : 'Failed to fetch grants',
+      },
+      {
+        status: 503,
+      },
+    );
+  }
 }

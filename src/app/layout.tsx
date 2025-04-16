@@ -34,9 +34,11 @@ export default function RootLayout({
         <ContextProvider>
           <ClientLayout>{children}</ClientLayout>
         </ContextProvider>
-        <div className="fixed inset-0 w-full h-full -z-10 flex items-center justify-center">
-          <BackgroundImage src={FEATURES.BG_IMAGE.src} />
-        </div>
+        {!!FEATURES.BG_IMAGE.src && (
+          <div className="w-full h-full -z-10 flex items-center justify-center">
+            <BackgroundImage src={FEATURES.BG_IMAGE.src} />
+          </div>
+        )}
         <Toaster />
       </body>
     </html>

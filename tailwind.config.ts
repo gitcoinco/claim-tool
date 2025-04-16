@@ -1,8 +1,10 @@
+import { tailwindConfig } from '@gitcoin/themes';
 import type { CSSProperties } from 'react';
 import type { Config } from 'tailwindcss';
 import { getWhitelabelThemeColors } from './config/features';
 
 const config: Config = {
+  presets: [tailwindConfig],
   darkMode: ['class'],
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -38,6 +40,9 @@ const config: Config = {
       },
       colors: {
         ...getWhitelabelThemeColors(),
+        neutral: {
+          100: '#F2F3F8',
+        },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

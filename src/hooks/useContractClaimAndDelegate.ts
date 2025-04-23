@@ -1,12 +1,14 @@
 import type { Claim } from '@/app/api/claims/route';
+import { handleTransactionError } from '@/lib/errorHandler';
 import { getPublicClientForChain } from '@/lib/getPublicClientForChain';
 import { useMutation } from '@tanstack/react-query';
 import { parse as uuidParse } from 'uuid';
-import { parseSignature, toHex } from 'viem';
+import { BaseError, parseSignature, toHex } from 'viem';
 import { useWalletClient } from 'wagmi';
 import { ClaimCampaignsAbi } from '../../config/contracts/abis/ClaimCampaignsAbi';
 import { hedgeyContractAddresses } from '../../config/contracts/addresses';
 import { FEATURES } from '../../config/features';
+import { useToast } from './useToast';
 
 const { DELEGATION_ENABLED } = FEATURES;
 
@@ -49,6 +51,7 @@ const delegatingClaimType = {
 
 export const useContractClaimAndDelegate = () => {
   const { data: walletClient } = useWalletClient();
+  const { toast } = useToast();
 
   return useMutation({
     throwOnError: true,
@@ -107,75 +110,87 @@ export const useContractClaimAndDelegate = () => {
         // https://github.com/hedgey-finance/DelegatedTokenClaims/blob/master/test/tests/unlockedDelegatingTests.js#L98
         const expiry =
           BigInt(Math.floor(Date.now() / 1000)) + BigInt(60 * 60 * 24 * 7);
-
-        const txSig = await walletClient.signTypedData({
-          domain: getClaimDomain('ClaimCampaigns', chainId),
-          types: delegatingClaimType,
-          message: {
-            campaignId: parsedClaimId,
-            claimer: address,
-            claimAmount: BigInt(claim.amount),
-            delegatee: delegatee,
+        try {
+          const txSig = await walletClient.signTypedData({
+            domain: getClaimDomain('ClaimCampaigns', chainId),
+            types: delegatingClaimType,
+            message: {
+              campaignId: parsedClaimId,
+              claimer: address,
+              claimAmount: BigInt(claim.amount),
+              delegatee: delegatee,
+              nonce,
+              expiry,
+            },
+            primaryType: 'DelegatingClaim',
+          });
+          const { r: r2, v: v2, s: s2 } = parseSignature(txSig);
+          const txSigFormatted = {
             nonce,
             expiry,
-          },
-          primaryType: 'DelegatingClaim',
-        });
-        const { r: r2, v: v2, s: s2 } = parseSignature(txSig);
-        const txSigFormatted = {
-          nonce,
-          expiry,
-          v: Number(v2),
-          r: r2,
-          s: s2,
-        };
+            v: Number(v2),
+            r: r2,
+            s: s2,
+          };
 
-        const delegationSig = await walletClient.signTypedData({
-          domain: getTokenDomain(tokenName, tokenAddress, chainId),
-          types: delegationTypes,
-          message: {
-            delegatee,
-            expiry,
+          const delegationSig = await walletClient.signTypedData({
+            domain: getTokenDomain(tokenName, tokenAddress, chainId),
+            types: delegationTypes,
+            message: {
+              delegatee,
+              expiry,
+              nonce,
+            },
+            primaryType: 'Delegation',
+          });
+          const { r, v, s } = parseSignature(delegationSig);
+          const delegationSigFormatted = {
             nonce,
-          },
-          primaryType: 'Delegation',
-        });
-        const { r, v, s } = parseSignature(delegationSig);
-        const delegationSigFormatted = {
-          nonce,
-          expiry,
-          v: Number(v),
-          r,
-          s,
-        };
-
-        const { request } = await publicClient.simulateContract({
-          address: hedgeyContractAddresses[chainId],
-          abi: ClaimCampaignsAbi,
-          functionName: 'claimAndDelegateWithSig',
-          value,
-          account: walletClient.account,
-          args: [
-            parsedClaimId,
-            claim.proof,
-            address,
-            BigInt(claim.amount),
-            txSigFormatted,
-            delegatee,
-            delegationSigFormatted,
-          ],
-        });
-        txHash = await walletClient.writeContract(request);
+            expiry,
+            v: Number(v),
+            r,
+            s,
+          };
+          const { request } = await publicClient.simulateContract({
+            address: hedgeyContractAddresses[chainId],
+            abi: ClaimCampaignsAbi,
+            functionName: 'claimAndDelegateWithSig',
+            value,
+            account: walletClient.account,
+            args: [
+              parsedClaimId,
+              claim.proof,
+              address,
+              BigInt(claim.amount),
+              txSigFormatted,
+              delegatee,
+              delegationSigFormatted,
+            ],
+          });
+          txHash = await walletClient.writeContract(request);
+        } catch (err) {
+          if (err instanceof BaseError) {
+            handleTransactionError(err, toast);
+          }
+          return;
+        }
       } else {
-        const { request } = await publicClient.simulateContract({
-          address: hedgeyContractAddresses[chainId],
-          abi: ClaimCampaignsAbi,
-          functionName: 'claim',
-          value,
-          account: walletClient.account,
-          args: [parsedClaimId, claim.proof, BigInt(claim.amount)],
-        });
-        txHash = await walletClient.writeContract(request);
+        try {
+          const data = await publicClient.simulateContract({
+            address: hedgeyContractAddresses[chainId],
+            abi: ClaimCampaignsAbi,
+            functionName: 'claim',
+            value,
+            account: walletClient.account,
+            args: [parsedClaimId, claim.proof, BigInt(claim.amount)],
+          });
+          txHash = await walletClient.writeContract(data.request);
+        } catch (err) {
+          if (err instanceof BaseError) {
+            handleTransactionError(err, toast);
+          }
+          return;
+        }
       }
 
       const receipt = await publicClient.waitForTransactionReceipt({

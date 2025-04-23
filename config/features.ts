@@ -1,5 +1,6 @@
 import colors from 'tailwindcss/colors';
 import {
+  base,
   mainnet,
   optimism,
   optimismSepolia,
@@ -8,15 +9,21 @@ import {
   zksyncSepoliaTestnet,
 } from 'wagmi/chains';
 
-type WHITELABEL_ENV = 'OPTIMISM' | 'ZK_SYNC';
+type WHITELABEL_ENV = 'OPTIMISM' | 'ZK_SYNC' | 'BASE';
 
-const _WHITELABEL_ENV = process.env.NEXT_PUBLIC_WHITELABEL_ENV;
+const _WHITELABEL_ENV = process.env.NEXT_PUBLIC_WHITELABEL_ENV ?? 'OPTIMISM';
 
 if (!_WHITELABEL_ENV) {
   throw new Error('NEXT_PUBLIC_WHITELABEL_ENV is not set');
 }
 
-if (!(_WHITELABEL_ENV === 'OPTIMISM' || _WHITELABEL_ENV === 'ZK_SYNC')) {
+if (
+  !(
+    _WHITELABEL_ENV === 'OPTIMISM' ||
+    _WHITELABEL_ENV === 'ZK_SYNC' ||
+    _WHITELABEL_ENV === 'BASE'
+  )
+) {
   throw new Error('NEXT_PUBLIC_WHITELABEL_ENV is not set to a valid value');
 }
 
@@ -35,6 +42,7 @@ interface Features {
   ONLY_SHOW_CLAIMABLE: boolean;
   CONFIRMATION_SUBHEADER: string;
   CONFIRMATION_SECOND_BUTTON_TEXT: string;
+  CONFIRMATION_SECOND_BUTTON_CLASSNAME?: string;
   CONFIRMATION_SECOND_BUTTON_LINK: string;
   CLAIM_FEE: boolean;
 }
@@ -75,6 +83,27 @@ const featureMatrix: Record<WHITELABEL_ENV, Features> = {
     CONFIRMATION_SECOND_BUTTON_LINK: '',
     CLAIM_FEE: true,
   },
+  BASE: {
+    APP_NAME: 'Base Claim Tool',
+    BG_IMAGE: {
+      src: '',
+    },
+    DELEGATION_REQUIRED: false,
+    DELEGATION_ENABLED: true,
+    DELEGATES_URL: 'https://vote.optimism.io/delegates',
+    CONFIRMATION_CHECKMARK_BG_COLOR: '#0070F3',
+    INTRO_TEXT:
+      "Explore all grants from the Base Citizen Grants Council and who they've delegated to. For grantees, this claiming tool offers a self-serve interface to claim and delegate your grant.",
+    ONLY_SHOW_CLAIMABLE: false,
+    CONFIRMATION_SUBHEADER:
+      'We strongly encourage you to set a delegate to represent you in Optimism governance.',
+    CONFIRMATION_SECOND_BUTTON_TEXT: 'See your claim history',
+    CONFIRMATION_SECOND_BUTTON_CLASSNAME:
+      'bg-[#0d5af9] rounded-3xl hover:bg-[#0d5af9]/80',
+    CONFIRMATION_SECOND_BUTTON_LINK:
+      'https://basegrantclaim.gitcoin.co/claim-history',
+    CLAIM_FEE: true,
+  },
 };
 
 export const FEATURES = featureMatrix[_WHITELABEL_ENV];
@@ -97,6 +126,11 @@ export const getChainConfig = () => {
         appName: 'ZKsync Claim Tool',
         chains: [mainnet, zksync, zksyncSepoliaTestnet],
       };
+    case 'BASE':
+      return {
+        appName: 'Base Claim Tool',
+        chains: [optimism, base, sepolia],
+      };
   }
 };
 
@@ -115,6 +149,12 @@ export const getWhitelabelThemeColors = (): WhitelabelThemeColors => {
         primaryActionButtonBg: colors.red[600],
       };
     case 'ZK_SYNC':
+      return {
+        bgClaimcardHeader: colors.blue[200],
+        primaryAction: colors.blue[500],
+        primaryActionButtonBg: colors.blue[900],
+      };
+    case 'BASE':
       return {
         bgClaimcardHeader: colors.blue[200],
         primaryAction: colors.blue[500],

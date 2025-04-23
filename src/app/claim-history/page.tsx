@@ -1,23 +1,22 @@
 'use client';
 
 import { CurrencySymbol } from '@/components/common/CurrencySymbol';
-import { SpinningLoader } from '@/components/common/SpinningLoader';
 import { TransactionCard } from '@/components/common/TransactionCard';
 import { GrantHistoryItemSkeleton } from '@/components/common/skeletons/ClaimHistorySkeleton';
 import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useGrants } from '@/context/GrantsContext';
 import { generateBlockExplorerUrl } from '@/lib/getPublicClientForChain';
 import { truncate } from '@/lib/truncate';
+import { cn } from '@/lib/utils';
 import { RiArrowRightUpLine } from '@remixicon/react';
 import { Hexagon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useAccount } from 'wagmi';
 import Smile from '../../../public/smile.svg';
-
 const ClaimHistory = () => {
   const { grants, isFetched, isLoading } = useGrants();
+  const { address } = useAccount();
   return (
     <>
       <div className="flex flex-col gap-6 items-start">
@@ -31,6 +30,7 @@ const ClaimHistory = () => {
         ) : (
           grants
             ?.filter((grant) => !!grant.claimEvents?.length)
+            .filter((grant) => grant.address === address)
             .map((grant) => (
               <div
                 key={grant.id}
@@ -52,7 +52,12 @@ const ClaimHistory = () => {
                           </p>
                           {grant.delegateTo && (
                             <>
-                              <Separator orientation="vertical" />
+                              <div
+                                className={cn(
+                                  'border-[#BCBFCD] border',
+                                  'w-px h-4',
+                                )}
+                              />
                               <div className="flex items-center gap-2">
                                 <p>Delegate to: </p>
                                 <Link
@@ -72,12 +77,25 @@ const ClaimHistory = () => {
                               </div>
                             </>
                           )}
-                          <Separator orientation="vertical" />
+                          <div
+                            className={cn(
+                              'border-[#BCBFCD] border',
+                              'w-px h-4',
+                            )}
+                          />
                           <div className="flex items-center gap-2">
                             <p>Remaining: </p>
                             <CurrencySymbol token={grant.campaign.token} />
                             <p className="font-semibold text-black">
-                              {Math.round(grant.grantAmount - grant.claimed)}{' '}
+                              {Math.round(
+                                grant.grantAmount -
+                                  (grant.claimEvents?.reduce(
+                                    (acc, curr) =>
+                                      acc +
+                                      Number(curr.claimedAmount ?? 0) / 1e18,
+                                    0,
+                                  ) ?? 0),
+                              )}{' '}
                               {grant.campaign.token?.ticker}
                             </p>
                           </div>

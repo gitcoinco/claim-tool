@@ -15,11 +15,25 @@ const getIcon = () => {
   if (WHITELABEL_ENV === 'OPTIMISM') {
     return '/currency_symbols/op.png';
   }
+
+  if (WHITELABEL_ENV === 'BASE') {
+    return '/currency_symbols/base.png';
+  }
+
+  return '/currency_symbols/eth.png';
+};
+
+const getBackgroundClassName = () => {
+  if (WHITELABEL_ENV === 'BASE') {
+    return 'bg-white';
+  }
+
+  return 'bg-secondary';
 };
 
 export const metadata: Metadata = {
   title: FEATURES.APP_NAME,
-  description: 'Powered by WalletConnect',
+  description: 'Powered by Gitcoin',
   icons: {
     icon: getIcon(),
   },
@@ -30,13 +44,15 @@ export default function RootLayout({
 }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${sora.variable}`}>
-      <body className="bg-secondary">
+      <body className={getBackgroundClassName()}>
         <ContextProvider>
           <ClientLayout>{children}</ClientLayout>
         </ContextProvider>
-        <div className="fixed inset-0 w-full h-full -z-10 flex items-center justify-center">
-          <BackgroundImage src={FEATURES.BG_IMAGE.src} />
-        </div>
+        {!!FEATURES.BG_IMAGE.src && (
+          <div className="fixed inset-0 w-full h-full -z-10 flex items-center justify-center">
+            <BackgroundImage src={FEATURES.BG_IMAGE.src} />
+          </div>
+        )}
         <Toaster />
       </body>
     </html>

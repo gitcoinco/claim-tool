@@ -10,6 +10,8 @@ export type Claim = {
   uuid: string;
   address: string;
   canClaim: boolean;
+  startDate: string;
+  endDate: string;
   proof?: `0x${string}`[];
   amount: string;
   claimFee: string;
@@ -58,6 +60,8 @@ export async function POST(request: NextRequest) {
 
       const result: Claim = {
         ...claim,
+        startDate: claimInfo.startDate,
+        endDate: claimInfo.endDate,
         claimFee: claimInfo.claimFee,
         claimed,
       };

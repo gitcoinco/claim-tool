@@ -149,5 +149,11 @@ export const getWhitelabelThemeColors = (): WhitelabelThemeColors => {
         primaryAction: colors.blue[500],
         primaryActionButtonBg: colors.blue[900],
       };
+    case 'SUNNY':
+      return {
+        bgClaimcardHeader: colors.blue[200],
+        primaryAction: colors.blue[500],
+        primaryActionButtonBg: colors.blue[900],
+      };
   }
 };
